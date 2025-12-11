@@ -198,30 +198,32 @@
             display: none;
         }
 
-        /* Sections Container */
+        /* Sections Container - single-card view (stacked) */
         .sections-container {
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
+            position: relative;
+            width: 100%;
+            height: 420px; /* fixed height for card area, responsive adjustments below */
+            perspective: 1200px;
         }
 
         /* Section Styles */
         .section {
             background: white;
-            border-radius: 30px;
-            padding: 50px 35px;
+            border-radius: 24px;
+            padding: 36px 28px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
-            position: relative;
+            position: absolute; /* stack sections */
+            inset: 0;
+            margin: 0;
             overflow: hidden;
-            min-height: 300px;
+            display: none; /* hidden by default; JS will show the active one */
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
-            opacity: 0;
-            transform: translateY(40px);
-            animation: slideInUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            transform-style: preserve-3d;
+            backface-visibility: hidden;
         }
 
         .section:nth-child(1) { animation-delay: 0.2s; }
@@ -258,6 +260,26 @@
         .section:hover {
             transform: translateY(-8px);
             box-shadow: 0 30px 80px rgba(255, 107, 166, 0.15);
+        }
+
+        /* Active (visible) section */
+        .section.active {
+            display: flex;
+            z-index: 2;
+        }
+
+        /* Flip animations */
+        .flip-out { animation: flipOut 600ms ease forwards; }
+        .flip-in  { animation: flipIn 600ms ease forwards;  z-index:3; }
+
+        @keyframes flipOut {
+            0% { transform: rotateY(0deg); opacity:1; }
+            100% { transform: rotateY(90deg) translateX(20px); opacity:0; }
+        }
+
+        @keyframes flipIn {
+            0% { transform: rotateY(-90deg) translateX(-20px); opacity:0; }
+            100% { transform: rotateY(0deg); opacity:1; }
         }
 
         .section-number {
@@ -511,7 +533,7 @@
             }
         }
 
-        /* ============ SCROLL INDICATORS ============ */
+        /* ============ NAV CONTROLS & SCROLL INDICATORS ============ */
         .scroll-hint {
             text-align: center;
             margin-top: 40px;
@@ -523,6 +545,29 @@
         .scroll-arrow {
             display: inline-block;
             animation: bobbing 2s ease-in-out infinite;
+        }
+
+        /* Navigation buttons for flipping between sections */
+        .nav-controls {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .nav-btn {
+            background: white;
+            border: 2px solid rgba(255,107,166,0.12);
+            color: var(--primary-pink);
+            padding: 10px 16px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+        }
+
+        .nav-btn[disabled] {
+            opacity: 0.45; cursor: default; box-shadow: none;
         }
     </style>
 </head>
@@ -545,15 +590,23 @@
     <div class="journey-page hidden" id="journeyPage">
         <div class="sections-container">
             
-            <!-- Section 1: Birthday Wish -->
-            <div class="section section-gradient-1">
-                <!-- <div class="section-number">1</div> -->
-                <div class="section-icon">🎂</div>
-                <h2 class="section-title">Happy Birthday! 🎉</h2>
-                <p class="section-text editable">
-                    On your special day, I want you to know how much you mean to me. Every moment with you is a gift, and I'm so grateful to celebrate you today. Wishing you endless joy, laughter, and beautiful memories ahead!
-                </p>
-            </div>
+                <!-- Section 1: Birthday Wish -->
+                <div class="section section-gradient-1">
+                    <div class="section-icon">🎂</div>
+                    <h2 class="section-title">Happy Birthday! 🎉</h2>
+                    <p class="section-text editable">
+                        Happy Birthday, you beautiful soul.
+                        <br>
+                        May your day feel as soft as morning light and as warm as your smile.
+                        <br>
+                        And honestly… if birthdays granted wishes,
+                        I’d wish for more moments with you—because somehow, you make life feel lighter.
+                        <br><br>
+                        You deserve peace, happiness, and someone who adores you…
+                        <br>
+                        (hopefully that role is already taken 😉).
+                    </p>
+                </div>
 
             <!-- Section 2: Your Role in My Life -->
             <div class="section section-gradient-2">
@@ -561,7 +614,16 @@
                 <div class="section-icon">👑</div>
                 <h2 class="section-title">What You Mean to Me</h2>
                 <p class="section-text editable">
-                    You are my sunshine on cloudy days, my inspiration when I feel lost, and my greatest joy. Your smile brightens my world, and your presence makes everything feel right. You are truly one of a kind, and I'm so lucky to have you in my life.
+                    If I have a place in your life,
+                    I hope it’s the one who brings calm to your storms
+                    and warmth to your quiet days.
+                        <br>
+                    I’m not here to change your world—
+                    just to stand beside you, care for you,
+                    and maybe… steal your smile a little more often.
+                    <br> 
+                    And if I get to be even a small reason for your happiness,
+                    that’s enough for me.
                 </p>
             </div>
 
@@ -571,7 +633,16 @@
                 <div class="section-icon">✨</div>
                 <h2 class="section-title">Our Beautiful Moments</h2>
                 <p class="section-text editable">
-                    From our first meeting to our silly inside jokes, every moment with you is treasured. Your laugh is contagious, your kindness is inspiring, and your love is unconditional. Thank you for filling my life with so much happiness and unforgettable memories.
+                </p>
+                Every day I spend with you turns into an adventure—
+                because you’re mischievous, fun-loving, and just the right amount of naughty.
+                <br>
+                You make even the simplest moments feel exciting,
+                and honestly…
+                time with you is never quiet, but always unforgettable.
+                <br> 
+                If I could choose how to spend my days,
+                I’d still pick the ones where I get to laugh, tease, and get in trouble with you.
                 </p>
             </div>
 
@@ -581,22 +652,50 @@
                 <div class="section-icon">💍</div>
                 <h2 class="section-title">There's Something I Want to Ask...</h2>
                 <p class="section-text editable">
-                    I've thought about this moment a thousand times, and there's nothing I want more. You make my life complete, and I want to spend forever with you. So, I'm asking from the depths of my heart... will you marry me?
+                     I want to tell you something gently…
+                    Somewhere between our laughs, our moments,
+                        and the way you make days brighter—
+                    I started feeling something more.
+                    <br>
+                    If your heart ever feels the same,
+                        I’d love to hold a place in your life
+                    not just as your person to laugh with…
+                    but also as someone who loves you.
+                    <br>
+                    And if not, that’s okay.
+                    You matter to me the same.
+                    Our bond will always stay safe with me.
                 </p>
-            </div>
-
+            </div}          
             <!-- Section 5: A Promise -->
             <div class="section section-final">
-                <div class="section-number" style="color: white; opacity: 0.3;">5</div>
                 <div class="section-icon">💫</div>
                 <h2 class="section-title">No Matter What...</h2>
                 <p class="section-text editable">
-                    Whatever your answer, know that my love for you is real and unconditional. You mean the world to me, and I'm grateful for every second we spend together. You make me a better person, and I cherish you more than words can express.
-                </p>
+                    Thank you for hearing me.
+                    And if my feelings don’t match yours,
+                    please know this—
+                    I respect your heart completely.
+
+                    I’m sorry if my words made you uncomfortable.
+                    But nothing changes what you mean to me.
+                    Our friendship stays untouched,
+                    because you’re someone I’ll always stand by.
+
+                    Your comfort matters more than my feelings,
+                    and I’ll always be here,
+            in the same way, with the same care.</p>
             </div>
 
         </div>
-        <div class="scroll-hint">
+
+        <!-- Navigation controls to flip through sections one at a time -->
+        <div class="nav-controls" id="navControls" style="display:none;">
+            <button class="nav-btn" id="prevBtn">◀ Prev</button>
+            <button class="nav-btn" id="nextBtn">Next ▶</button>
+        </div>
+
+        <div class="scroll-hint" id="scrollHint">
             <span class="scroll-arrow">↓</span> Scroll down to explore <span class="scroll-arrow">↓</span>
         </div>
     </div>
@@ -607,7 +706,7 @@
             {
                 title: "Happy Birthday! 🎉",
                 emoji: "🎂",
-                text: "On your special day, I want you to know how much you mean to me. Every moment with you is a gift, and I'm so grateful to celebrate you today. Wishing you endless joy, laughter, and beautiful memories ahead!"
+                text: "Happy Birthday, you beautiful soul.\nMay your day feel as soft as morning light and as warm as your smile.\nAnd honestly… if birthdays granted wishes, I’d wish for more moments with you—because somehow, you make life feel lighter.\n\nYou deserve peace, happiness, and someone who adores you…\n(hopefully that role is already taken 😉)."
             },
             {
                 title: "What You Mean to Me",
@@ -640,6 +739,8 @@
             
             // Trigger celebration effects
             createCelebration();
+            // Initialize flip-carousel so only the first section shows (fixes all-sections-visible issue)
+            initFlipCarousel();
         }
 
         function createSparkles(x = window.innerWidth / 2, y = window.innerHeight / 2) {
@@ -685,6 +786,74 @@
             setTimeout(() => createSparkles(), 500);
             setTimeout(() => createConfetti(), 1000);
         }
+
+        /* ------------------ Flip carousel logic ------------------ */
+        let sections = null;
+        let currentIndex = 0;
+
+        function initFlipCarousel() {
+            sections = Array.from(document.querySelectorAll('.sections-container .section'));
+            currentIndex = 0;
+            // hide all
+            sections.forEach(s => { s.classList.remove('active','flip-in','flip-out'); s.style.display = 'none'; });
+            // show first without animation
+            if (sections.length) {
+                sections[0].style.display = 'flex';
+                sections[0].classList.add('active');
+            }
+            // show nav controls
+            const nav = document.getElementById('navControls');
+            if (nav) nav.style.display = 'flex';
+            updateNavButtons();
+        }
+
+        function updateNavButtons() {
+            const prev = document.getElementById('prevBtn');
+            const next = document.getElementById('nextBtn');
+            if (!prev || !next || !sections) return;
+            prev.disabled = currentIndex <= 0;
+            next.disabled = currentIndex >= sections.length - 1;
+        }
+
+        function showSection(newIndex) {
+            if (!sections) return;
+            if (newIndex < 0 || newIndex >= sections.length || newIndex === currentIndex) return;
+
+            const curr = sections[currentIndex];
+            const next = sections[newIndex];
+
+            // prepare next
+            next.style.display = 'flex';
+            next.classList.add('active','flip-in');
+
+            // animate out current
+            curr.classList.add('flip-out');
+
+            // cleanup after animations
+            const onCurrEnd = () => {
+                curr.classList.remove('active','flip-out');
+                curr.style.display = 'none';
+                curr.removeEventListener('animationend', onCurrEnd);
+            };
+            curr.addEventListener('animationend', onCurrEnd);
+
+            const onNextEnd = () => {
+                next.classList.remove('flip-in');
+                next.removeEventListener('animationend', onNextEnd);
+            };
+            next.addEventListener('animationend', onNextEnd);
+
+            currentIndex = newIndex;
+            updateNavButtons();
+        }
+
+        // attach nav button listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            const prev = document.getElementById('prevBtn');
+            const next = document.getElementById('nextBtn');
+            if (prev) prev.addEventListener('click', () => showSection(Math.max(0, currentIndex - 1)));
+            if (next) next.addEventListener('click', () => showSection(Math.min(sections.length - 1, currentIndex + 1)));
+        });
 
         // Interactive section text editing (optional)
         document.querySelectorAll('.section-text.editable').forEach((element, index) => {
